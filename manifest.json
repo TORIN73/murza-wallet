@@ -3,14 +3,15 @@
   "short_name": "Murza",
   "start_url": "./24murza-wallet.html",
   "display": "standalone",
-  "background_color": "#09091f",
-  "theme_color": "#09091f",
+  "background_color": "#080810",
+  "theme_color": "#080810",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%2309091f'/><text x='96' y='125' text-anchor='middle' font-size='110'>💰</text></svg>",
-      "sizes": "192x192",
-      "type": "image/svg+xml"
+      "src": "Murza_Wallet.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
