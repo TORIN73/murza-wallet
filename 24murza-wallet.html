@@ -695,7 +695,7 @@ body {
           <span class="logo-w">Wallet</span>
         </div>
         <div class="topbar-actions">
-          <button class="install-pill" onclick="document.getElementById('manual-install').style.display='flex'">📲 Установить</button>
+          <button class="install-pill" id="install-pill-btn" onclick="document.getElementById('manual-install').style.display='flex'">📲 Установить</button>
           <div class="avatar">M</div>
         </div>
       </div>
@@ -1307,7 +1307,17 @@ window.addEventListener('beforeinstallprompt', e => {
 });
 window.addEventListener('appinstalled', () => {
   document.getElementById('pwa-banner').style.display = 'none';
+  const pill = document.getElementById('install-pill-btn');
+  if (pill) pill.style.display = 'none';
 });
+
+// Hide install button if already running as installed PWA
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+  document.addEventListener('DOMContentLoaded', () => {
+    const pill = document.getElementById('install-pill-btn');
+    if (pill) pill.style.display = 'none';
+  });
+}
 if ('serviceWorker' in navigator) {
   const sw = `self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>clients.claim());self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).catch(()=>new Response(''))));`;
   const blob = new Blob([sw], { type: 'application/javascript' });
