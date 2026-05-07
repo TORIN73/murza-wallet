@@ -1,0 +1,17 @@
+{
+  "name": "Murza Wallet",
+  "short_name": "Murza",
+  "start_url": "./24murza-wallet.html",
+  "display": "standalone",
+  "background_color": "#080810",
+  "theme_color": "#080810",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "Murza_Wallet.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
