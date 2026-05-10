@@ -803,8 +803,26 @@ button{-webkit-appearance:none}
 
 <script>
 /* ── STATE ── */
+function loadState() {
+  try {
+    const saved = localStorage.getItem('murza_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return { savings: parsed.savings||[], tasks: parsed.tasks||[] };
+    }
+  } catch(e) {}
+  return { savings: [], tasks: [] };
+}
+function saveState() {
+  try {
+    localStorage.setItem('murza_state', JSON.stringify({ savings: S.savings, tasks: S.tasks }));
+  } catch(e) {}
+}
+
+const _loaded = loadState();
 const S = {
-  savings:[], tasks:[],
+  savings: _loaded.savings,
+  tasks:   _loaded.tasks,
   tab:'home', sub:'active',
   modal:null, editId:null,
   emoji:'🎯', cat:'Работа',
@@ -1015,10 +1033,10 @@ function renderTasks(){
 }
 
 /* ── ACTIONS ── */
-function delSaving(id){ S.savings=S.savings.filter(g=>g.id!==id); render(); }
-function delTask(id)  { S.tasks=S.tasks.filter(t=>t.id!==id); render(); }
-function doneTask(id) { S.tasks=S.tasks.map(t=>t.id===id?{...t,done:true}:t); confetti(); render(); }
-function undoTask(id) { S.tasks=S.tasks.map(t=>t.id===id?{...t,done:false}:t); render(); }
+function delSaving(id){ S.savings=S.savings.filter(g=>g.id!==id); saveState(); render(); }
+function delTask(id)  { S.tasks=S.tasks.filter(t=>t.id!==id); saveState(); render(); }
+function doneTask(id) { S.tasks=S.tasks.map(t=>t.id===id?{...t,done:true}:t); saveState(); confetti(); render(); }
+function undoTask(id) { S.tasks=S.tasks.map(t=>t.id===id?{...t,done:false}:t); saveState(); render(); }
 
 function confetti(){
   const cols=['#1DB364','#26D978','#C8A84A','#E8F2EC','#0D6B3A'];
@@ -1111,20 +1129,20 @@ function submitSaving(){
   const cur =+document.getElementById('f-cur').value||0;
   if(!name||!goal){ shake('f-name'); return; }
   S.savings.unshift({id:Date.now(),name,goal,current:Math.min(cur,goal),emoji:S.emoji,createdAt:now()});
-  closeModal(); render();
+  saveState(); closeModal(); render();
 }
 function submitUpdate(id,goal){
   const val=+document.getElementById('f-upd').value;
   if(isNaN(val)||val<0) return;
   S.savings=S.savings.map(g=>g.id===id?{...g,current:Math.min(val,goal)}:g);
-  closeModal(); render();
+  saveState(); closeModal(); render();
 }
 function submitTask(){
   const name=document.getElementById('f-tname').value.trim();
   const rew =+document.getElementById('f-trew').value;
   if(!name||!rew){ shake('f-tname'); return; }
   S.tasks.unshift({id:Date.now(),name,reward:rew,category:S.cat,done:false,createdAt:now()});
-  closeModal(); render();
+  saveState(); closeModal(); render();
 }
 
 function shake(id){
