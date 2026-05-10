@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MURZA</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#080C0A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MURZA">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png">
+
+<!-- SEO / Share -->
+<meta name="description" content="Личный финансовый трекер накоплений и задач">
+<meta property="og:title" content="MURZA">
+<meta property="og:description" content="Личный финансовый трекер накоплений и задач">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+
+/* ═══════════════════════════════════════════
+   TOKENS — Emerald × Black
+   ═══════════════════════════════════════════ */
+:root {
+  --bg:          #080C0A;
+  --bg2:         #0D1410;
+  --bg3:         #121C17;
+  --card:        #111710;
+  --card2:       #162014;
+  --border:      #1E2E22;
+  --border2:     #2A4030;
+  --em:          #1DB364;   /* изумруд */
+  --em2:         #26D978;   /* светлый изумруд */
+  --em3:         #0D6B3A;   /* тёмный изумруд */
+  --em-bg:       #0D2018;
+  --em-glow:     rgba(29,179,100,.28);
+  --gold:        #C8A84A;   /* золото — детали */
+  --gold-bg:     #1C1608;
+  --text:        #E8F2EC;
+  --text2:       #6B9077;
+  --text3:       #3A5040;
+  --success:     #1DB364;
+  --warn:        #C8A84A;
+  --danger:      #C84A4A;
+  --nav-bg:      rgba(8,12,10,.97);
+}
+
+/* ═══════════════════════════════════════════
+   RESET & BASE
+   ═══════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{
+  height:100%;background:var(--bg);
+  font-family:'DM Sans',sans-serif;
+  color:var(--text);-webkit-font-smoothing:antialiased;
+  overscroll-behavior:none;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+input[type=number]{-moz-appearance:textfield}
+::-webkit-scrollbar{width:0}
+button{-webkit-appearance:none}
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════ */
+@keyframes slideUp   {from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn    {from{opacity:0}to{opacity:1}}
+@keyframes sheet     {from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes barIn     {from{width:0}to{}}
+@keyframes pulseGlow {0%,100%{box-shadow:0 0 16px var(--em-glow)}50%{box-shadow:0 0 36px var(--em-glow),0 0 60px rgba(29,179,100,.1)}}
+@keyframes pop       {0%{transform:scale(1)}45%{transform:scale(1.18)}100%{transform:scale(1)}}
+@keyframes confetti  {0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(80px) rotate(540deg);opacity:0}}
+@keyframes shimmer   {0%{background-position:-300% 0}100%{background-position:300% 0}}
+@keyframes rotate    {from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+.slide-up {animation:slideUp .4s cubic-bezier(.16,1,.3,1) both}
+.fade-in  {animation:fadeIn .25s ease both}
+
+/* ═══════════════════════════════════════════
+   LAYOUT
+   ═══════════════════════════════════════════ */
+#app{max-width:430px;margin:0 auto;min-height:100vh;position:relative;background:var(--bg);overflow-x:hidden}
+
+/* ── HEADER ── */
+#header{
+  position:sticky;top:0;z-index:40;
+  background:var(--nav-bg);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:13px 16px 12px;
+}
+#header-inner{display:flex;justify-content:space-between;align-items:center}
+#logo-wrap{display:flex;align-items:center;gap:9px}
+#logo-gem{
+  width:30px;height:30px;border-radius:10px;
+  background:linear-gradient(135deg,var(--em3),var(--em));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 12px var(--em-glow);
+}
+#logo-name{
+  font-family:'Playfair Display',serif;
+  font-size:17px;font-weight:700;
+  background:linear-gradient(90deg,var(--em2),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;letter-spacing:.5px;
+}
+#hdr-right{display:flex;align-items:center;gap:8px}
+#bal-pill{
+  background:var(--em-bg);
+  border:1px solid var(--border2);
+  border-radius:20px;padding:5px 13px;
+  font-family:'Playfair Display',serif;
+  font-size:14px;font-style:italic;
+  color:var(--em2);letter-spacing:-.2px;
+}
+
+/* ── CONTENT ── */
+#content{padding-bottom:88px;overflow-y:auto;height:calc(100vh - 57px)}
+
+/* ── BOTTOM NAV ── */
+#nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;
+  background:var(--nav-bg);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:grid;grid-template-columns:repeat(3,1fr);
+  z-index:40;padding-bottom:env(safe-area-inset-bottom,0);
+}
+.nav-btn{
+  padding:10px 0 12px;background:none;border:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+}
+.nav-ico{transition:transform .25s cubic-bezier(.34,1.56,.64,1),color .15s}
+.nav-btn.active .nav-ico{transform:scale(1.18)}
+.nav-lbl{font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;transition:color .15s}
+.nav-dot{
+  width:4px;height:4px;border-radius:2px;
+  background:var(--em);margin-top:1px;
+  opacity:0;transform:scale(0);
+  transition:opacity .2s,transform .2s cubic-bezier(.34,1.56,.64,1);
+}
+.nav-btn.active .nav-dot{opacity:1;transform:scale(1)}
+
+.nbadge{
+  position:absolute;top:6px;right:calc(50% - 14px);
+  min-width:16px;height:16px;padding:0 4px;
+  background:var(--em);border-radius:8px;
+  font-size:9px;font-weight:700;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:scale(0);
+  transition:all .2s cubic-bezier(.34,1.56,.64,1);
+  position:absolute;
+}
+.nbadge.show{opacity:1;transform:scale(1)}
+.nav-btn{position:relative}
+
+/* ── TABS ── */
+.tab{display:none}
+.tab.active{display:block}
+
+/* ═══════════════════════════════════════════
+   HERO SECTION
+   ═══════════════════════════════════════════ */
+.hero{
+  position:relative;overflow:hidden;
+  padding:28px 20px 30px;
+  background:linear-gradient(160deg,#050A07 0%,#0A1A0E 40%,#0F2416 70%,#071510 100%);
+}
+/* Decorative emerald orb */
+.hero::before{
+  content:'';position:absolute;
+  right:-80px;top:-80px;
+  width:260px;height:260px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(29,179,100,.18) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero::after{
+  content:'';position:absolute;
+  left:-60px;bottom:-60px;
+  width:200px;height:200px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(200,168,74,.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+/* Grid lines texture */
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(29,179,100,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(29,179,100,.04) 1px,transparent 1px);
+  background-size:32px 32px;
+  pointer-events:none;
+}
+.hero-label{
+  font-size:10px;font-weight:600;letter-spacing:1.4px;
+  color:rgba(107,144,119,.8);text-transform:uppercase;margin-bottom:7px;
+  position:relative;
+}
+.hero-bal{
+  font-family:'Playfair Display',serif;
+  font-size:50px;font-weight:500;line-height:1;
+  letter-spacing:-2px;margin-bottom:5px;
+  position:relative;
+  background:linear-gradient(135deg,#E8F2EC 0%,var(--em2) 50%,#E8F2EC 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-quote{
+  font-size:12px;color:rgba(107,144,119,.75);
+  font-style:italic;margin-bottom:22px;position:relative;
+}
+.hero-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative}
+.hero-card{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(29,179,100,.15);
+  border-radius:14px;padding:12px 14px;
+  backdrop-filter:blur(8px);
+}
+.hero-card-lbl{
+  font-size:9px;font-weight:600;letter-spacing:.9px;
+  color:rgba(107,144,119,.7);text-transform:uppercase;margin-bottom:5px;
+}
+.hero-card-val{
+  font-size:20px;font-weight:600;color:var(--text);
+}
+
+/* ═══════════════════════════════════════════
+   OVERALL PROGRESS (home)
+   ═══════════════════════════════════════════ */
+.overall{
+  margin:12px 16px 0;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:13px 15px;
+}
+.overall-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.overall-label{
+  font-size:11px;font-weight:500;color:var(--text2);
+  display:flex;align-items:center;gap:5px;
+}
+.overall-pct{font-size:14px;font-weight:700;color:var(--em)}
+
+/* ═══════════════════════════════════════════
+   PROGRESS BAR
+   ═══════════════════════════════════════════ */
+.bar-track{
+  height:5px;background:var(--bg3);
+  border-radius:10px;overflow:hidden;
+}
+.bar-fill{
+  height:100%;border-radius:10px;
+  transition:width .8s cubic-bezier(.4,0,.2,1);
+  position:relative;
+}
+.bar-fill::after{
+  content:'';position:absolute;
+  top:0;right:0;bottom:0;width:3px;
+  background:rgba(255,255,255,.35);border-radius:2px;
+}
+
+/* ═══════════════════════════════════════════
+   SECTION
+   ═══════════════════════════════════════════ */
+.section{padding:16px 16px 0}
+.sec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
+.sec-title{
+  font-size:10px;font-weight:700;
+  color:var(--text3);letter-spacing:1px;text-transform:uppercase;
+}
+.sec-link{
+  font-size:12px;font-weight:600;color:var(--em);
+  background:none;border:none;cursor:pointer;font-family:inherit;padding:0;
+}
+
+/* ═══════════════════════════════════════════
+   QUICK ACTIONS
+   ═══════════════════════════════════════════ */
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.quick-btn{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:15px 14px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:flex-start;gap:9px;
+  font-family:inherit;text-align:left;
+  transition:border-color .15s,transform .12s;
+}
+.quick-btn:active{transform:scale(.96);border-color:var(--border2)}
+.q-ico{
+  width:34px;height:34px;border-radius:10px;
+  background:var(--em-bg);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+}
+.q-title{font-size:13px;font-weight:600;color:var(--text)}
+.q-sub{font-size:10px;color:var(--text3);margin-top:-5px}
+
+/* ═══════════════════════════════════════════
+   SAVING CARD
+   ═══════════════════════════════════════════ */
+.scard{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:18px;padding:16px;margin-bottom:10px;
+  position:relative;overflow:hidden;
+  transition:border-color .2s;
+}
+.scard::before{
+  content:'';position:absolute;
+  left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--em),var(--em3));
+  border-radius:3px 0 0 3px;opacity:0;
+  transition:opacity .3s;
+}
+.scard.completed::before{opacity:1}
+.scard.completed{border-color:var(--border2)}
+
+.scard-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.scard-info{display:flex;align-items:center;gap:11px}
+.scard-ico{
+  width:44px;height:44px;border-radius:13px;
+  background:var(--em-bg);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:21px;flex-shrink:0;
+}
+.scard-name{font-size:15px;font-weight:600;color:var(--text);margin-bottom:2px}
+.scard-date{font-size:10px;color:var(--text3);font-weight:500}
+.scard-acts{display:flex;gap:6px}
+
+.scard-nums{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px}
+.scard-cur{
+  font-family:'Playfair Display',serif;
+  font-size:24px;font-style:italic;color:var(--text);letter-spacing:-.5px;
+}
+.scard-goal{text-align:right}
+.scard-goal-lbl{font-size:9px;color:var(--text3);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px}
+.scard-goal-val{font-size:13px;font-weight:600;color:var(--text2)}
+
+.scard-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.scard-remain{font-size:11px;color:var(--text3)}
+.scard-pct{font-size:12px;font-weight:700}
+.done-badge{
+  font-size:11px;font-weight:700;color:var(--em);
+  display:flex;align-items:center;gap:4px;
+}
+
+/* preview card (home) */
+.pcard{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:12px 14px;margin-bottom:8px;
+}
+.pcard-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.pcard-name{font-size:13px;font-weight:600;color:var(--text)}
+.pcard-pct{font-size:12px;font-weight:700}
+.pcard-sub{font-size:10px;color:var(--text3);margin-bottom:5px}
+
+/* ═══════════════════════════════════════════
+   TASK CARD
+   ═══════════════════════════════════════════ */
+.tcard{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:14px 15px;margin-bottom:9px;
+  display:flex;gap:12px;align-items:flex-start;
+  transition:opacity .25s,border-color .15s;
+}
+.tcard.done{opacity:.55;background:var(--bg2)}
+.tchk{
+  width:22px;height:22px;border-radius:7px;flex-shrink:0;
+  border:1.5px solid var(--border2);background:transparent;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;margin-top:1px;
+  transition:all .2s cubic-bezier(.34,1.56,.64,1);
+}
+.tchk.on{background:var(--em);border-color:var(--em);animation:pop .25s ease}
+.tbody{flex:1;min-width:0}
+.tname{font-size:14px;font-weight:500;color:var(--text);margin-bottom:6px;transition:color .2s}
+.tcard.done .tname{text-decoration:line-through;color:var(--text3)}
+.tmeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tright{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0}
+.treward{
+  font-family:'Playfair Display',serif;
+  font-size:19px;font-style:italic;
+  color:var(--em);letter-spacing:-.3px;
+}
+.tcard.done .treward{color:var(--text2)}
+
+/* ═══════════════════════════════════════════
+   TAGS
+   ═══════════════════════════════════════════ */
+.tag{
+  font-size:10px;font-weight:600;
+  background:var(--em-bg);color:var(--em);
+  padding:2px 8px;border-radius:20px;
+  border:1px solid var(--border2);
+}
+.tag-done{background:var(--bg3);color:var(--text3);border-color:var(--border)}
+
+/* ═══════════════════════════════════════════
+   SUBTABS
+   ═══════════════════════════════════════════ */
+.subtabs{
+  display:flex;background:var(--bg2);
+  border-radius:13px;padding:3px;margin-bottom:14px;
+  border:1px solid var(--border);
+}
+.subtab{
+  flex:1;padding:8px;border-radius:11px;border:1px solid transparent;
+  cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;
+  background:transparent;color:var(--text3);transition:all .2s;
+}
+.subtab.active{
+  background:var(--card2);color:var(--text);
+  border-color:var(--border2);
+  box-shadow:0 2px 8px rgba(0,0,0,.3);
+}
+
+/* ═══════════════════════════════════════════
+   ICON BUTTONS
+   ═══════════════════════════════════════════ */
+.ibtn{
+  width:30px;height:30px;border-radius:9px;cursor:pointer;
+  border:1px solid var(--border);
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--bg2);transition:all .15s;
+}
+.ibtn:active{transform:scale(.9)}
+.ibtn-del{background:rgba(200,74,74,.1);border-color:rgba(200,74,74,.2)}
+
+/* ═══════════════════════════════════════════
+   DONE / BACK BUTTONS
+   ═══════════════════════════════════════════ */
+.done-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(29,179,100,.12);border:1px solid rgba(29,179,100,.3);
+  border-radius:8px;padding:5px 10px;cursor:pointer;
+  font-size:12px;font-weight:600;color:var(--em);font-family:inherit;
+  transition:transform .1s;
+}
+.done-btn:active{transform:scale(.94)}
+.back-btn{
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:8px;padding:5px 10px;cursor:pointer;
+  font-size:12px;color:var(--text3);font-family:inherit;
+  transition:transform .1s;
+}
+
+/* ═══════════════════════════════════════════
+   ADD BUTTON
+   ═══════════════════════════════════════════ */
+.add-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 15px;border-radius:11px;border:none;cursor:pointer;
+  font-size:13px;font-weight:600;font-family:inherit;
+  background:linear-gradient(135deg,var(--em3),var(--em));color:#fff;
+  box-shadow:0 4px 16px var(--em-glow);
+  transition:transform .1s,box-shadow .1s;
+}
+.add-btn:active{transform:scale(.96)}
+
+/* ═══════════════════════════════════════════
+   PAGE TITLE
+   ═══════════════════════════════════════════ */
+.page-title{
+  font-family:'Playfair Display',serif;
+  font-size:27px;font-style:italic;
+  background:linear-gradient(135deg,var(--text) 30%,var(--em2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+/* ═══════════════════════════════════════════
+   EMPTY STATE
+   ═══════════════════════════════════════════ */
+.empty{text-align:center;padding:54px 24px;color:var(--text3)}
+.empty-ico{font-size:38px;margin-bottom:14px;opacity:.5}
+.empty-title{
+  font-family:'Playfair Display',serif;
+  font-size:22px;font-style:italic;color:var(--text2);margin-bottom:7px;
+}
+.empty-sub{font-size:13px;color:var(--text3)}
+
+/* ═══════════════════════════════════════════
+   MODAL / SHEET
+   ═══════════════════════════════════════════ */
+#overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.72);z-index:60;
+  align-items:flex-end;justify-content:center;
+}
+#overlay.open{display:flex;animation:fadeIn .2s ease}
+#sheet{
+  background:var(--bg2);
+  border-radius:24px 24px 0 0;
+  border-top:1px solid var(--border2);
+  width:100%;max-width:430px;
+  padding:0 0 env(safe-area-inset-bottom,0);
+  animation:sheet .32s cubic-bezier(.32,.72,0,1);
+  max-height:90vh;overflow-y:auto;
+}
+.sheet-handle{
+  width:38px;height:4px;border-radius:2px;
+  background:var(--border2);margin:12px auto 0;
+}
+.sheet-inner{padding:20px 20px 32px}
+.sheet-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.sheet-title{
+  font-family:'Playfair Display',serif;
+  font-size:22px;font-style:italic;
+  background:linear-gradient(90deg,var(--text),var(--em2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.sheet-close{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--border2);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);
+}
+
+/* ─ FORM ─ */
+.field{margin-bottom:16px}
+.field-lbl{
+  font-size:10px;font-weight:700;
+  color:var(--text3);letter-spacing:.9px;
+  text-transform:uppercase;margin-bottom:7px;
+}
+.finput{
+  width:100%;padding:12px 14px;
+  border:1.5px solid var(--border2);border-radius:12px;
+  background:var(--bg3);
+  font-size:15px;color:var(--text);
+  outline:none;font-family:inherit;
+  transition:border-color .15s,box-shadow .15s;
+}
+.finput:focus{border-color:var(--em);box-shadow:0 0 0 3px var(--em-glow)}
+.finput::placeholder{color:var(--text3)}
+
+/* emoji grid */
+.egrid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.ebtn{
+  font-size:20px;width:42px;height:42px;
+  border-radius:11px;cursor:pointer;
+  border:1.5px solid var(--border);
+  background:var(--bg3);transition:all .15s;
+}
+.ebtn.on{background:var(--em-bg);border-color:var(--em);transform:scale(1.1)}
+
+/* category pills */
+.cpills{display:flex;flex-wrap:wrap;gap:7px}
+.cpill{
+  padding:7px 14px;border-radius:20px;font-size:13px;cursor:pointer;
+  font-family:inherit;font-weight:500;
+  border:1.5px solid var(--border);background:var(--bg3);color:var(--text2);
+  transition:all .15s;
+}
+.cpill.on{background:var(--em-bg);border-color:var(--em);color:var(--em)}
+
+/* progress preview in modal */
+.ppreview{
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:13px;padding:13px 14px;margin-bottom:16px;
+}
+.ppreview-val{
+  font-family:'Playfair Display',serif;
+  font-size:22px;font-style:italic;color:var(--text);margin-bottom:8px;
+}
+
+/* buttons */
+.btn{
+  width:100%;padding:13px;border-radius:13px;border:none;cursor:pointer;
+  font-size:14px;font-weight:600;font-family:inherit;
+  transition:transform .1s,opacity .15s;
+}
+.btn:active{transform:scale(.97)}
+.btn-em{
+  background:linear-gradient(135deg,var(--em3),var(--em));color:#fff;
+  box-shadow:0 4px 16px var(--em-glow);
+}
+.btn-sec{background:var(--bg3);color:var(--text2);border:1px solid var(--border2)}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+
+/* ═══════════════════════════════════════════
+   CONFETTI
+   ═══════════════════════════════════════════ */
+.particle{
+  position:fixed;pointer-events:none;z-index:99;
+  width:7px;height:7px;border-radius:2px;
+  animation:confetti 1.1s ease-out forwards;
+}
+
+/* ═══════════════════════════════════════════
+   DIVIDER
+   ═══════════════════════════════════════════ */
+.divider{height:1px;background:var(--border);margin:0 16px}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div id="header">
+    <div id="header-inner">
+      <div id="logo-wrap">
+        <div id="logo-gem">
+          <!-- Gem icon -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M6 3h12l4 6-10 12L2 9z" stroke="rgba(255,255,255,.9)" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M2 9h20M6 3l4 6M18 3l-4 6" stroke="rgba(255,255,255,.55)" stroke-width="1.2"/>
+          </svg>
+        </div>
+        <span id="logo-name">MURZA</span>
+      </div>
+      <div id="hdr-right">
+        <div id="bal-pill">₽ 0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- ══ HOME ══ -->
+    <div id="tab-home" class="tab active">
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-grid"></div>
+        <div class="hero-label">Общий баланс</div>
+        <div class="hero-bal" id="home-bal">₽ 0</div>
+        <div class="hero-quote" id="home-quote">Каждый рубль — шаг к мечте</div>
+        <div class="hero-cards">
+          <div class="hero-card">
+            <div class="hero-card-lbl">Выполнено задач</div>
+            <div class="hero-card-val" id="home-done">0</div>
+          </div>
+          <div class="hero-card">
+            <div class="hero-card-lbl">Всего накоплено</div>
+            <div class="hero-card-val" id="home-saved">₽ 0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overall progress -->
+      <div class="overall" id="home-overall" style="display:none">
+        <div class="overall-row">
+          <span class="overall-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            Общий прогресс накоплений
+          </span>
+          <span class="overall-pct" id="home-ovpct">0%</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="home-ovbar" style="width:0%;background:var(--em)"></div></div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="section">
+        <div class="sec-hdr"><span class="sec-title">Быстрые действия</span></div>
+        <div class="quick-grid">
+          <button class="quick-btn" onclick="switchTab('savings');setTimeout(()=>openModal('add-saving'),60)">
+            <div class="q-ico">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--em)" stroke-width="1.8" stroke-linecap="round"><path d="M19 8a2 2 0 010 4"/><path d="M4 8h12a4 4 0 010 8H8l-2 3H4l1-3A4 4 0 014 8z"/></svg>
+            </div>
+            <div>
+              <div class="q-title">Накопление</div>
+              <div class="q-sub">Поставить цель</div>
+            </div>
+          </button>
+          <button class="quick-btn" onclick="switchTab('tasks');setTimeout(()=>openModal('add-task'),60)">
+            <div class="q-ico">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--em)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            </div>
+            <div>
+              <div class="q-title">Задание</div>
+              <div class="q-sub">Заработать деньги</div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Savings preview -->
+      <div id="home-sv-sec" style="display:none">
+        <div class="section">
+          <div class="sec-hdr">
+            <span class="sec-title">Накопления</span>
+            <button class="sec-link" onclick="switchTab('savings')">Все →</button>
+          </div>
+          <div id="home-sv-list"></div>
+        </div>
+      </div>
+
+      <!-- Tasks preview -->
+      <div id="home-tk-sec" style="display:none">
+        <div class="section">
+          <div class="sec-hdr">
+            <span class="sec-title">Активные задания</span>
+            <button class="sec-link" onclick="switchTab('tasks')">Все →</button>
+          </div>
+          <div id="home-tk-list"></div>
+        </div>
+      </div>
+
+      <!-- Empty -->
+      <div id="home-empty" class="empty" style="display:none">
+        <div class="empty-ico">◆</div>
+        <div class="empty-title">Добро пожаловать в MURZA</div>
+        <div class="empty-sub">Создай первое накопление или задание</div>
+      </div>
+
+      <div style="height:12px"></div>
+    </div>
+
+    <!-- ══ SAVINGS ══ -->
+    <div id="tab-savings" class="tab">
+      <div style="padding:16px 16px 0;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span class="page-title">Накопления</span>
+        <button class="add-btn" onclick="openModal('add-saving')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Добавить
+        </button>
+      </div>
+      <div style="padding:0 16px">
+        <div id="sav-empty" class="empty" style="display:none">
+          <div class="empty-ico">🪙</div>
+          <div class="empty-title">Нет накоплений</div>
+          <div class="empty-sub">Создай первую цель</div>
+        </div>
+        <div id="sav-list"></div>
+      </div>
+    </div>
+
+    <!-- ══ TASKS ══ -->
+    <div id="tab-tasks" class="tab">
+      <div style="padding:16px 16px 0;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span class="page-title">Задания</span>
+        <button class="add-btn" onclick="openModal('add-task')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Добавить
+        </button>
+      </div>
+      <div style="padding:0 16px">
+        <div class="subtabs">
+          <button class="subtab active" id="stab-active" onclick="switchSubtab('active')">Активные (<span id="cnt-active">0</span>)</button>
+          <button class="subtab" id="stab-done" onclick="switchSubtab('done')">Выполнены (<span id="cnt-done">0</span>)</button>
+        </div>
+        <div id="tk-empty" class="empty" style="display:none">
+          <div class="empty-ico">✦</div>
+          <div class="empty-title" id="tk-empty-msg">Нет активных заданий</div>
+        </div>
+        <div id="tk-list"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav id="nav">
+    <button class="nav-btn active" id="nav-home" onclick="switchTab('home')">
+      <div class="nav-ico" style="color:var(--em)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+      </div>
+      <span class="nav-lbl" style="color:var(--em)">Главная</span>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nav-savings" onclick="switchTab('savings')" style="position:relative">
+      <div class="nav-ico" style="color:var(--text3)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M19 8a2 2 0 010 4"/><path d="M4 8h12a4 4 0 010 8H8l-2 3H4l1-3A4 4 0 014 8z"/></svg>
+      </div>
+      <span class="nav-lbl" style="color:var(--text3)">Накопления</span>
+      <div class="nav-dot"></div>
+      <div class="nbadge" id="badge-sav"></div>
+    </button>
+    <button class="nav-btn" id="nav-tasks" onclick="switchTab('tasks')" style="position:relative">
+      <div class="nav-ico" style="color:var(--text3)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      </div>
+      <span class="nav-lbl" style="color:var(--text3)">Задания</span>
+      <div class="nav-dot"></div>
+      <div class="nbadge" id="badge-tk"></div>
+    </button>
+  </nav>
+
+</div>
+
+<!-- MODAL -->
+<div id="overlay" onclick="oClick(event)">
+  <div id="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-inner">
+      <div class="sheet-hdr">
+        <div class="sheet-title" id="sheet-title"></div>
+        <button class="sheet-close" onclick="closeModal()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div id="sheet-body"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── STATE ── */
+const S = {
+  savings:[], tasks:[],
+  tab:'home', sub:'active',
+  modal:null, editId:null,
+  emoji:'🎯', cat:'Работа',
+};
+
+const QUOTES = [
+  'Каждый рубль — шаг к мечте ✦',
+  'Дисциплина рождает свободу',
+  'Двигаемся вперёд, не останавливаемся',
+  'Сегодня — лучший день для роста',
+  'Цель ясна. Путь выбран.',
+];
+let qI = Math.floor(Math.random() * QUOTES.length);
+
+const EMOJIS = ['🎯','✈️','🏠','💻','🚗','👜','📱','🌊','🎓','💍','🏋️','🎸','🌿','🏖️','🎨','💎'];
+const CATS   = ['Работа','Фриланс','Личное','Творчество','Другое'];
+
+/* ── HELPERS ── */
+const fmt  = n => '₽\u00a0' + Math.round(n).toLocaleString('ru-RU');
+const pct  = (c,g) => g > 0 ? Math.min(100, Math.round(c/g*100)) : 0;
+const bal  = () => S.tasks.filter(t=>t.done).reduce((a,t)=>a+t.reward,0);
+const now  = () => new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'short'});
+const bc   = p => p>=70?'var(--em)':p>=35?'var(--warn)':'#C84A4A';
+
+function svgEdit(){return`<svg width="13"height="13"viewBox="0 0 24 24"fill="none"stroke="var(--text2)"stroke-width="1.8"stroke-linecap="round"stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`}
+function svgTrash(){return`<svg width="13"height="13"viewBox="0 0 24 24"fill="none"stroke="#C84A4A"stroke-width="1.8"stroke-linecap="round"stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>`}
+function svgOk(){return`<svg width="11"height="11"viewBox="0 0 24 24"fill="none"stroke="#fff"stroke-width="2.4"stroke-linecap="round"stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`}
+
+/* ── TAB SWITCH ── */
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    b.classList.remove('active');
+    b.querySelector('.nav-ico').style.color='var(--text3)';
+    b.querySelector('.nav-lbl').style.color='var(--text3)';
+  });
+  document.getElementById('tab-'+t).classList.add('active');
+  const nb = document.getElementById('nav-'+t);
+  nb.classList.add('active');
+  nb.querySelector('.nav-ico').style.color='var(--em)';
+  nb.querySelector('.nav-lbl').style.color='var(--em)';
+  S.tab = t;
+  const titles = {home:'MURZA', savings:'Накопления', tasks:'Задания'};
+  document.getElementById('logo-name').textContent = titles[t];
+  render();
+}
+
+function switchSubtab(s){
+  S.sub = s;
+  document.querySelectorAll('.subtab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('stab-'+s).classList.add('active');
+  renderTasks();
+}
+
+/* ── RENDER ── */
+function render(){
+  document.getElementById('bal-pill').textContent = fmt(bal());
+  if(S.tab==='home')    renderHome();
+  if(S.tab==='savings') renderSavings();
+  if(S.tab==='tasks')   renderTasks();
+  // badges
+  const bs = document.getElementById('badge-sav');
+  const bt = document.getElementById('badge-tk');
+  const sc = S.savings.length;
+  const tc = S.tasks.filter(t=>!t.done).length;
+  bs.textContent=sc; bs.classList.toggle('show', sc>0 && S.tab!=='savings');
+  bt.textContent=tc; bt.classList.toggle('show', tc>0 && S.tab!=='tasks');
+}
+
+function renderHome(){
+  document.getElementById('home-bal').textContent = fmt(bal());
+  document.getElementById('home-quote').textContent = QUOTES[qI];
+  document.getElementById('home-done').textContent  = S.tasks.filter(t=>t.done).length;
+  const ts = S.savings.reduce((a,g)=>a+g.current,0);
+  const tg = S.savings.reduce((a,g)=>a+g.goal,0);
+  document.getElementById('home-saved').textContent = fmt(ts);
+
+  // overall
+  const ovEl = document.getElementById('home-overall');
+  if(S.savings.length>0 && tg>0){
+    ovEl.style.display='block';
+    const p = pct(ts,tg);
+    const pEl = document.getElementById('home-ovpct');
+    pEl.textContent = p+'%'; pEl.style.color = bc(p);
+    const bar = document.getElementById('home-ovbar');
+    bar.style.width = p+'%'; bar.style.background = bc(p);
+  } else { ovEl.style.display='none'; }
+
+  // savings preview
+  const ss = document.getElementById('home-sv-sec');
+  const sl = document.getElementById('home-sv-list');
+  if(S.savings.length>0){
+    ss.style.display='block';
+    sl.innerHTML = S.savings.slice(0,2).map(g=>{
+      const p = pct(g.current,g.goal);
+      return `<div class="pcard slide-up">
+        <div class="pcard-row">
+          <span class="pcard-name">${g.emoji} ${g.name}</span>
+          <span class="pcard-pct" style="color:${bc(p)}">${p}%</span>
+        </div>
+        <div class="pcard-sub">${fmt(g.current)} из ${fmt(g.goal)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${bc(p)}"></div></div>
+      </div>`;
+    }).join('');
+  } else { ss.style.display='none'; }
+
+  // tasks preview
+  const ts2 = document.getElementById('home-tk-sec');
+  const tl  = document.getElementById('home-tk-list');
+  const pend = S.tasks.filter(t=>!t.done).slice(0,3);
+  if(pend.length>0){
+    ts2.style.display='block';
+    tl.innerHTML = pend.map(t=>`
+      <div class="pcard" style="display:flex;align-items:center;gap:11px">
+        <div style="width:32px;height:32px;border-radius:9px;background:var(--em-bg);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="14"height="14"viewBox="0 0 24 24"fill="none"stroke="var(--em)"stroke-width="1.8"stroke-linecap="round"><circle cx="12"cy="12"r="9"/><path d="M12 7v1m0 8v1M9.5 9.5c0-1.1.9-2 2.5-2s2.5.9 2.5 2-1.5 2-2.5 2-2.5.9-2.5 2 .9 2 2.5 2 2.5-.9 2.5-2"/></svg>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.name}</div>
+          <div style="font-size:10px;color:var(--text3)">${t.category}</div>
+        </div>
+        <span style="font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:var(--em);flex-shrink:0">${fmt(t.reward)}</span>
+      </div>
+    `).join('');
+  } else { ts2.style.display='none'; }
+
+  document.getElementById('home-empty').style.display =
+    (S.savings.length===0 && S.tasks.length===0) ? 'block':'none';
+}
+
+function renderSavings(){
+  const list = document.getElementById('sav-list');
+  const empty= document.getElementById('sav-empty');
+  if(!S.savings.length){ empty.style.display='block'; list.innerHTML=''; return; }
+  empty.style.display='none';
+  list.innerHTML = S.savings.map((g,i)=>{
+    const p = pct(g.current,g.goal);
+    const c = bc(p);
+    return `<div class="scard slide-up${p===100?' completed':''}" style="animation-delay:${i*.05}s">
+      <div class="scard-head">
+        <div class="scard-info">
+          <div class="scard-ico">${g.emoji}</div>
+          <div>
+            <div class="scard-name">${g.name}</div>
+            <div class="scard-date">с ${g.createdAt}</div>
+          </div>
+        </div>
+        <div class="scard-acts">
+          <button class="ibtn" onclick="openModal('update-saving',{id:${g.id}})">${svgEdit()}</button>
+          <button class="ibtn ibtn-del" onclick="delSaving(${g.id})">${svgTrash()}</button>
+        </div>
+      </div>
+      <div class="scard-nums">
+        <div>
+          <div style="font-size:9px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:2px">Накоплено</div>
+          <div class="scard-cur">${fmt(g.current)}</div>
+        </div>
+        <div class="scard-goal">
+          <div class="scard-goal-lbl">Цель</div>
+          <div class="scard-goal-val">${fmt(g.goal)}</div>
+        </div>
+      </div>
+      <div class="bar-track" style="margin-top:4px"><div class="bar-fill" style="width:${p}%;background:${c}"></div></div>
+      <div class="scard-footer">
+        <span class="scard-remain">Осталось: ${fmt(Math.max(0,g.goal-g.current))}</span>
+        ${p===100
+          ? `<span class="done-badge">${svgOk().replace('#fff','var(--em)')} Цель достигнута</span>`
+          : `<span class="scard-pct" style="color:${c}">${p}%</span>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderTasks(){
+  const active = S.tasks.filter(t=>!t.done);
+  const done   = S.tasks.filter(t=>t.done);
+  document.getElementById('cnt-active').textContent = active.length;
+  document.getElementById('cnt-done').textContent   = done.length;
+  const list  = S.sub==='active' ? active : done;
+  const empty = document.getElementById('tk-empty');
+  const tl    = document.getElementById('tk-list');
+  document.getElementById('tk-empty-msg').textContent = S.sub==='active'?'Нет активных заданий':'Нет выполненных заданий';
+  if(!list.length){ empty.style.display='block'; tl.innerHTML=''; return; }
+  empty.style.display='none';
+  tl.innerHTML = list.map((t,i)=>`
+    <div class="tcard${t.done?' done':''} slide-up" style="animation-delay:${i*.05}s">
+      <button class="tchk${t.done?' on':''}" onclick="${t.done?'undoTask':'doneTask'}(${t.id})">
+        ${t.done ? svgOk() : ''}
+      </button>
+      <div class="tbody">
+        <div class="tname">${t.name}</div>
+        <div class="tmeta">
+          <span class="tag${t.done?' tag-done':''}">${t.category}</span>
+          <span style="font-size:10px;color:var(--text3)">${t.createdAt}</span>
+        </div>
+      </div>
+      <div class="tright">
+        <div class="treward">${fmt(t.reward)}</div>
+        <div style="display:flex;gap:5px">
+          ${!t.done
+            ? `<button class="done-btn" onclick="doneTask(${t.id})">${svgOk().replace('#fff','var(--em)')} Готово</button>`
+            : `<button class="back-btn" onclick="undoTask(${t.id})">Вернуть</button>`}
+          <button class="ibtn ibtn-del" onclick="delTask(${t.id})">${svgTrash()}</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ── ACTIONS ── */
+function delSaving(id){ S.savings=S.savings.filter(g=>g.id!==id); render(); }
+function delTask(id)  { S.tasks=S.tasks.filter(t=>t.id!==id); render(); }
+function doneTask(id) { S.tasks=S.tasks.map(t=>t.id===id?{...t,done:true}:t); confetti(); render(); }
+function undoTask(id) { S.tasks=S.tasks.map(t=>t.id===id?{...t,done:false}:t); render(); }
+
+function confetti(){
+  const cols=['#1DB364','#26D978','#C8A84A','#E8F2EC','#0D6B3A'];
+  for(let i=0;i<14;i++){
+    const el=document.createElement('div');
+    el.className='particle';
+    el.style.cssText=`left:${25+Math.random()*50}%;top:${35+Math.random()*25}%;background:${cols[i%cols.length]};animation-delay:${i*.04}s;transform:rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),1300);
+  }
+}
+
+/* ── MODAL ── */
+function openModal(type, data={}){
+  S.modal=type; S.editId=data.id||null;
+  S.emoji=data.emoji||'🎯'; S.cat=data.category||'Работа';
+  const title = document.getElementById('sheet-title');
+  const body  = document.getElementById('sheet-body');
+
+  if(type==='add-saving'){
+    title.textContent='Новое накопление';
+    body.innerHTML=`
+      <div class="field">
+        <div class="field-lbl">Иконка</div>
+        <div class="egrid">${EMOJIS.map(e=>`<button class="ebtn${e===S.emoji?' on':''}" onclick="selEmoji('${e}')">${e}</button>`).join('')}</div>
+      </div>
+      <div class="field"><div class="field-lbl">Название</div><input class="finput" id="f-name" placeholder="Например: BMW в гараж"></div>
+      <div class="field"><div class="field-lbl">Цель (₽)</div><input class="finput" id="f-goal" type="number" placeholder="300 000"></div>
+      <div class="field"><div class="field-lbl">Уже накоплено (₽)</div><input class="finput" id="f-cur" type="number" placeholder="0"></div>
+      <div class="btn-row">
+        <button class="btn btn-sec" onclick="closeModal()">Отмена</button>
+        <button class="btn btn-em" onclick="submitSaving()">Создать</button>
+      </div>`;
+
+  } else if(type==='update-saving'){
+    const g = S.savings.find(s=>s.id===data.id);
+    const p = pct(g.current,g.goal);
+    title.textContent = g.emoji+' '+g.name;
+    body.innerHTML=`
+      <div class="ppreview">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.9px;color:var(--text3);text-transform:uppercase;margin-bottom:5px">Текущий прогресс</div>
+        <div class="ppreview-val">${fmt(g.current)} <span style="font-size:13px;color:var(--text3)">из ${fmt(g.goal)}</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${bc(p)}"></div></div>
+        <div style="font-size:11px;font-weight:700;color:${bc(p)};margin-top:6px">${p}%</div>
+      </div>
+      <div class="field"><div class="field-lbl">Новая сумма (₽)</div><input class="finput" id="f-upd" type="number" value="${g.current}"></div>
+      <div class="btn-row">
+        <button class="btn btn-sec" onclick="closeModal()">Отмена</button>
+        <button class="btn btn-em" onclick="submitUpdate(${g.id},${g.goal})">Обновить</button>
+      </div>`;
+
+  } else if(type==='add-task'){
+    title.textContent='Новое задание';
+    body.innerHTML=`
+      <div class="field"><div class="field-lbl">Название задания</div><input class="finput" id="f-tname" placeholder="Например: Сделать проект для клиента"></div>
+      <div class="field"><div class="field-lbl">Вознаграждение (₽)</div><input class="finput" id="f-trew" type="number" placeholder="10 000"></div>
+      <div class="field">
+        <div class="field-lbl" style="margin-bottom:8px">Категория</div>
+        <div class="cpills">${CATS.map(c=>`<button class="cpill${c===S.cat?' on':''}" onclick="selCat('${c}')">${c}</button>`).join('')}</div>
+      </div>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn btn-sec" onclick="closeModal()">Отмена</button>
+        <button class="btn btn-em" onclick="submitTask()">Создать</button>
+      </div>`;
+  }
+
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(()=>{ const fi=body.querySelector('.finput'); if(fi) fi.focus(); }, 360);
+}
+
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  S.modal=null;
+}
+function oClick(e){
+  if(e.target===document.getElementById('overlay')) closeModal();
+}
+function selEmoji(e){
+  S.emoji=e;
+  document.querySelectorAll('.ebtn').forEach(b=>b.classList.toggle('on',b.textContent===e));
+}
+function selCat(c){
+  S.cat=c;
+  document.querySelectorAll('.cpill').forEach(b=>b.classList.toggle('on',b.textContent===c));
+}
+
+function submitSaving(){
+  const name=document.getElementById('f-name').value.trim();
+  const goal=+document.getElementById('f-goal').value;
+  const cur =+document.getElementById('f-cur').value||0;
+  if(!name||!goal){ shake('f-name'); return; }
+  S.savings.unshift({id:Date.now(),name,goal,current:Math.min(cur,goal),emoji:S.emoji,createdAt:now()});
+  closeModal(); render();
+}
+function submitUpdate(id,goal){
+  const val=+document.getElementById('f-upd').value;
+  if(isNaN(val)||val<0) return;
+  S.savings=S.savings.map(g=>g.id===id?{...g,current:Math.min(val,goal)}:g);
+  closeModal(); render();
+}
+function submitTask(){
+  const name=document.getElementById('f-tname').value.trim();
+  const rew =+document.getElementById('f-trew').value;
+  if(!name||!rew){ shake('f-tname'); return; }
+  S.tasks.unshift({id:Date.now(),name,reward:rew,category:S.cat,done:false,createdAt:now()});
+  closeModal(); render();
+}
+
+function shake(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.style.borderColor='var(--danger)';
+  el.style.boxShadow='0 0 0 3px rgba(200,74,74,.2)';
+  setTimeout(()=>{el.style.borderColor='';el.style.boxShadow=''},1500);
+}
+
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+render();
+
+// ── SERVICE WORKER ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
